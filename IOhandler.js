@@ -36,18 +36,19 @@ const unzip = (pathIn, pathOut) => {
  * @param {string} path
  * @return {promise}
  */
-const readDir = (dir) => {
-  pngFiles = [];
-  fsP.readdir(dir)
-    .then((files) => {
-      files.forEach((file) => {
-        if (file.endsWith(".png")) {
-          pngFiles.push(path.join(dir, file));
-        }
-      })
+const readDir = async (dir) => {
+  if (fs.existsSync(dir)) {
+    let pngFiles = [];
+    let images = await fsP.readdir(dir);
+    images.forEach(image => {
+      if (image.endsWith(".png")) {
+        pngFiles.push(path.join(dir, image))
+      }
     })
-    .then(() => console.log("Read Directory Success" + pngFiles))
-    .catch((err) => console.log(err));
+    return pngFiles;
+  } else {
+    throw new Error("Directory does not exist");
+  }
 };
 
 /**
@@ -58,8 +59,8 @@ const readDir = (dir) => {
  * @param {string} pathProcessed
  * @return {promise}
  */
-const grayScale = (pathIn, pathOut) => {
-  fs.createReadStream("in.png")
+const grayScale = (filePath, pathProcessed) => {
+  fs.createReadStream(filePath)
     .pipe(
       new PNG()
     )
@@ -79,9 +80,13 @@ const grayScale = (pathIn, pathOut) => {
           // this.data[idx + 3] = this.data[idx + 3] >> 1;
         }
       }
-
-      this.pack().pipe(fs.createWriteStream("out.png"));
-    });
+      this.pack().pipe(fs.createWriteStream(pathProcessed));
+    })
+    .promise()
+    .then((files) => {
+      fs.createWriteStream(pathProcessed).pipe(files);
+    })
+    .catch((err) => console.log(err));
 };
 
 module.exports = {
