@@ -37,18 +37,14 @@ const unzip = (pathIn, pathOut) => {
  * @return {promise}
  */
 const readDir = async (dir) => {
-  if (fs.existsSync(dir)) {
-    let pngFiles = [];
-    let images = await fsP.readdir(dir);
-    images.forEach(image => {
-      if (image.endsWith(".png")) {
-        pngFiles.push(path.join(dir, image))
-      }
-    })
-    return pngFiles;
-  } else {
-    throw new Error("Directory does not exist");
-  }
+  // if (fs.existsSync(dir)) {
+  await fsP.readdir(dir)
+    .then((images) => images.filter((image) => image.endsWith(".png")))
+    .then(() => console.log("Successfully read"))
+    .catch((err) => console.log(err));
+  // } else {
+  //   throw new Error("Directory does not exist");
+  // }
 };
 
 /**

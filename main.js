@@ -13,9 +13,11 @@ const IOhandler = require("./IOhandler"),
   pathUnzipped = `${__dirname}/unzipped`,
   pathProcessed = `${__dirname}/grayscaled`;
 
-// IOhandler.unzip(zipFilePath, pathUnzipped);
+IOhandler.unzip(zipFilePath, pathUnzipped);
 pngFiles = IOhandler.readDir(pathUnzipped);
-console.log(typeof (pngFiles));
-pngFiles.forEach(image => {
-  IOhandler.grayScale(image, pathProcessed);
-})
+console.log(pngFiles);
+// pngFiles.then((images) => {
+//   images.forEach((png) => {
+//     IOhandler.grayScale(png, pathProcessed);
+//   })
+// });
