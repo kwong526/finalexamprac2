@@ -22,7 +22,7 @@ const unzipper = require("unzipper"),
  * @return {promise}
  */
 const unzip = (pathIn, pathOut) => {
-  fs.createReadStream(pathIn)
+  return fs.createReadStream(pathIn)
     .pipe(unzipper.Extract({ path: pathOut }))
     .pipe(unzipper.Parse())
     .promise()
@@ -37,14 +37,19 @@ const unzip = (pathIn, pathOut) => {
  * @return {promise}
  */
 const readDir = async (dir) => {
-  // if (fs.existsSync(dir)) {
-  await fsP.readdir(dir)
-    .then((images) => images.filter((image) => image.endsWith(".png")))
-    .then(() => console.log("Successfully read"))
-    .catch((err) => console.log(err));
-  // } else {
-  //   throw new Error("Directory does not exist");
-  // }
+  if (fs.existsSync(dir)) {
+    let files = await fsP.readdir(dir);
+    let images = [];
+
+    files.forEach((file) => {
+      images.push(path.join(dir, file));
+    });
+
+    return images.filter((image) => image.includes(".png"));
+
+  } else {
+    throw new Error("Directory does not exist");
+  }
 };
 
 /**
@@ -57,9 +62,7 @@ const readDir = async (dir) => {
  */
 const grayScale = (filePath, pathProcessed) => {
   fs.createReadStream(filePath)
-    .pipe(
-      new PNG()
-    )
+    .pipe(new PNG())
     .on("parsed", function () {
       for (var y = 0; y < this.height; y++) {
         for (var x = 0; x < this.width; x++) {
@@ -78,11 +81,6 @@ const grayScale = (filePath, pathProcessed) => {
       }
       this.pack().pipe(fs.createWriteStream(pathProcessed));
     })
-    .promise()
-    .then((files) => {
-      fs.createWriteStream(pathProcessed).pipe(files);
-    })
-    .catch((err) => console.log(err));
 };
 
 module.exports = {
