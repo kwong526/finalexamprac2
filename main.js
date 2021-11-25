@@ -20,7 +20,11 @@ unzipFiles()
   .then(async () => await IOhandler.readDir(pathUnzipped))
   .then(async (images) => {
     // console.log(images)
-    await images.forEach(image => IOhandler.grayScale(image, pathProcessed))
+
+    await images.forEach((image) => {
+      let id = Math.round(Math.random() * 2000);
+      IOhandler.grayScale(image, `${pathProcessed}/${id}.png`)
+    });
   })
   .catch((err) => console.log(err));
 

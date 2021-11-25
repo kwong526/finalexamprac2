@@ -24,7 +24,6 @@ const unzipper = require("unzipper"),
 const unzip = (pathIn, pathOut) => {
   return fs.createReadStream(pathIn)
     .pipe(unzipper.Extract({ path: pathOut }))
-    .pipe(unzipper.Parse())
     .promise()
     .then(() => console.log("Extracted"))
     .catch((err) => console.log(err));
@@ -45,7 +44,9 @@ const readDir = async (dir) => {
       images.push(path.join(dir, file));
     });
 
-    return images.filter((image) => image.includes(".png"));
+    const filteredImages = images.filter((image) => image.includes(".png"));
+    console.log(filteredImages);
+    return filteredImages;
 
   } else {
     throw new Error("Directory does not exist");
